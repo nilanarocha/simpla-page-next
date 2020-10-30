@@ -1,69 +1,61 @@
-import Head from 'next/head';
 import styles from '../styles/Home.module.css';
-import Link from 'next/link';
+import Head from 'next/head';
 
-export default function Home() {
-  return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+import { Component, Fragment } from 'react';
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Read{' '}
-          <Link href="/posts/first-post">
-            <a>this page!</a>
-          </Link>
-        </h1>
+class Home extends Component {
+  state = {
+    title: '',
+    image: '',
+    article: '',
+  };
+  async componentDidMount() {
+    try {
+      const response = await this.callBackendAPI();
+      this.setState({ ...response });
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
+  callBackendAPI = async () => {
+    const response = await fetch('/api/article');
+    const body = await response.json();
 
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
+    if (response.status !== 200) {
+      throw Error(body.message);
+    }
+    return body;
+  };
 
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+  render() {
+    const { title, image, article } = this.state;
+    return (
+      <Fragment>
+        <div className={styles.container}>
+          <Head>
+            <title>Simple Page</title>
+            <link rel="icon" href="/cat.ico" />
+          </Head>
+          <article>
+            <h1>{title || 'title not found'}</h1>
+            {image ? (
+              <img src={image} alt="cat" />
+            ) : (
+              <img
+                src="https://www.macedonrangeshalls.com.au/wp-content/uploads/2017/10/image-not-found.png"
+                alt="cat"
+              />
+            )}
+            {article && <p>{article}</p>}
+          </article>
+          <footer className="footer">
+            <p className="p">© All Rights Reserved by Nilana Rocha2020</p>
+          </footer>
         </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
-    </div>
-  );
+      </Fragment>
+    );
+  }
 }
+
+export default Home;
